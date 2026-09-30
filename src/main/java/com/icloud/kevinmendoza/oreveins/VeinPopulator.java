@@ -164,10 +164,8 @@ final class VeinPopulator extends BlockPopulator {
             if (vein.environment() != world.getEnvironment() || vein.material() != Material.LAVA) {
                 continue;
             }
-            int minimum = Math.max(world.getMinHeight(),
-                    reference.scale(vein.minY(), world.getMinHeight(), world.getMaxHeight()));
-            int maximum = Math.min(world.getMaxHeight() - 1,
-                    reference.scale(vein.maxY(), world.getMinHeight(), world.getMaxHeight()));
+            int minimum = scaledMinY(reference, vein, world.getMinHeight(), world.getMaxHeight());
+            int maximum = scaledMaxY(reference, vein, world.getMinHeight(), world.getMaxHeight());
             if (y >= minimum && y <= maximum) {
                 return true;
             }
@@ -255,8 +253,8 @@ final class VeinPopulator extends BlockPopulator {
     private static void generateVein(GenerationRegion region, Random random,
             int chunkX, int chunkZ, HeightReference reference, VeinDefinition vein,
             int worldMinY, int worldMaxY) {
-        int minY = Math.max(worldMinY, reference.scale(vein.minY(), worldMinY, worldMaxY));
-        int maxY = Math.min(worldMaxY - 1, reference.scale(vein.maxY(), worldMinY, worldMaxY));
+        int minY = scaledMinY(reference, vein, worldMinY, worldMaxY);
+        int maxY = scaledMaxY(reference, vein, worldMinY, worldMaxY);
         if (maxY < minY) {
             return;
         }
@@ -298,6 +296,16 @@ final class VeinPopulator extends BlockPopulator {
                 failures++;
             }
         }
+    }
+
+    /** Lowest start Y of {@code vein} in a world with these build limits (maxY exclusive). */
+    static int scaledMinY(HeightReference reference, VeinDefinition vein, int worldMinY, int worldMaxY) {
+        return Math.max(worldMinY, reference.scale(vein.minY(), worldMinY, worldMaxY));
+    }
+
+    /** Highest start Y of {@code vein}; below {@link #scaledMinY} the pass places nothing in that world. */
+    static int scaledMaxY(HeightReference reference, VeinDefinition vein, int worldMinY, int worldMaxY) {
+        return Math.min(worldMaxY - 1, reference.scale(vein.maxY(), worldMinY, worldMaxY));
     }
 
     private static BlockPos findStart(GenerationRegion region, Random random, int chunkX, int chunkZ,

@@ -90,6 +90,27 @@ final class Messages {
         return language.startsWith("de") ? "de" : DEFAULT_LANGUAGE;
     }
 
+    /**
+     * Language for a request that only knows a language code (for example the
+     * web page): the fixed language, else German for "de*" codes, else English.
+     */
+    String languageForCode(String code) {
+        if (fixedLanguage != null) {
+            return fixedLanguage;
+        }
+        String language = code == null ? "" : code.trim().toLowerCase(Locale.ROOT);
+        return language.startsWith("de") ? "de" : DEFAULT_LANGUAGE;
+    }
+
+    /** Like {@link #format} but without the chat prefix, for texts shown outside the chat. */
+    String plain(String language, String key, Object... placeholders) {
+        String text = raw(language, key).replace("{prefix}", "");
+        for (int index = 0; index + 1 < placeholders.length; index += 2) {
+            text = text.replace("{" + placeholders[index] + "}", String.valueOf(placeholders[index + 1]));
+        }
+        return text;
+    }
+
     /** Language used for console log lines: the fixed language, else English. */
     String consoleLanguage() {
         return fixedLanguage != null ? fixedLanguage : DEFAULT_LANGUAGE;

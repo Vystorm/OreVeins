@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.OptionalInt;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -21,12 +22,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 public final class OreVeinsPlugin extends JavaPlugin implements Listener {
     private static final List<String> SUBCOMMANDS = List.of("reload", "status", "regenerate");
+    private static final List<String> SUBCOMMANDS_WITH_WEB = List.of("reload", "status", "regenerate", "web");
     private static final List<String> REGENERATE_TARGETS = List.of("all", "cancel", "loaded", "chunk", "8");
 
     private volatile GeneratorSettings settings;
@@ -34,6 +38,9 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
     private FileConfiguration configuration;
     private VeinPopulator populator;
     private ExistingChunkRetrofitter retrofitter;
+    private AdminActions actions;
+    private volatile boolean legacyConfig;
+    private volatile WebIntegration web;
 
     @Override
     public void onEnable() {
@@ -45,6 +52,7 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
                     getDataFolder(), this::getResource, getLogger());
             settings = GeneratorSettings.load(loaded.config(), getLogger(), messages);
             configuration = loaded.config();
+            legacyConfig = loaded.legacy();
             if (loaded.legacy()) {
                 getLogger().info(messages.console("startup.legacy-config"));
             }
@@ -56,6 +64,7 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
 
         populator = new VeinPopulator(() -> settings);
         retrofitter = new ExistingChunkRetrofitter(this, () -> settings, () -> messages);
+        actions = new AdminActions(() -> settings, retrofitter, this::reloadSettings);
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(retrofitter, this);
         for (World world : Bukkit.getWorlds()) {
@@ -65,10 +74,16 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
         getLogger().info(messages.console("startup.loaded", "count", settings.veins().size()));
         getLogger().info(messages.console(settings.retrofitExistingChunks()
                 ? "startup.retrofit-on" : "startup.retrofit-off", "version", settings.retrofitVersion()));
+        web = WebIntegration.load(this, actions);
     }
 
     @Override
     public void onDisable() {
+        WebIntegration current = web;
+        web = null;
+        if (current != null) {
+            current.stop();
+        }
         if (retrofitter != null) {
             retrofitter.stop();
         }
@@ -110,6 +125,66 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
         attach(event.getWorld());
     }
 
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        WebIntegration current = web;
+        if (current != null) {
+            current.worldsChanged();
+        }
+    }
+
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent event) {
+        WebIntegration current = web;
+        if (current != null) {
+            current.worldsChanged();
+        }
+    }
+
+    /**
+     * {@code /oreveins reload}: reads config.yml and the language files again.
+     * On any error the previous settings stay active.
+     */
+    AdminActions.Outcome reloadSettings() {
+        try {
+            ConfigFiles.Loaded loaded = readConfiguration();
+            Messages newMessages = Messages.load(loaded.config().getString("language", "auto"),
+                    getDataFolder(), this::getResource, getLogger());
+            GeneratorSettings newSettings = GeneratorSettings.load(loaded.config(), getLogger(), newMessages);
+            configuration = loaded.config();
+            legacyConfig = loaded.legacy();
+            messages = newMessages;
+            settings = newSettings;
+            for (World world : Bukkit.getWorlds()) {
+                attach(world);
+            }
+            retrofitter.enqueueLoadedChunks();
+            WebIntegration current = web;
+            if (current != null) {
+                current.reloaded();
+            }
+            return AdminActions.Outcome.ok(new AdminActions.Line("reload.done", "count", newSettings.veins().size()));
+        } catch (IOException | InvalidConfigurationException | RuntimeException exception) {
+            return AdminActions.Outcome.failed(new AdminActions.Line("reload.failed", "error", exception.getMessage()));
+        }
+    }
+
+    Messages messages() {
+        return messages;
+    }
+
+    GeneratorSettings settings() {
+        return settings;
+    }
+
+    boolean legacyConfig() {
+        return legacyConfig;
+    }
+
+    String languageSetting() {
+        return getConfig().getString("language", "auto");
+    }
+
     private void attach(World world) {
         GeneratorSettings current = settings;
         if (populator == null || current == null || !current.enables(world.getName(), world.getEnvironment())) {
@@ -132,41 +207,16 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
             @NotNull String label, String @NotNull [] args) {
         Messages text = messages;
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-            try {
-                ConfigFiles.Loaded loaded = readConfiguration();
-                Messages newMessages = Messages.load(loaded.config().getString("language", "auto"),
-                        getDataFolder(), this::getResource, getLogger());
-                GeneratorSettings newSettings = GeneratorSettings.load(loaded.config(), getLogger(), newMessages);
-                configuration = loaded.config();
-                messages = newMessages;
-                settings = newSettings;
-                for (World world : Bukkit.getWorlds()) {
-                    attach(world);
-                }
-                retrofitter.enqueueLoadedChunks();
-                newMessages.send(sender, "reload.done", "count", newSettings.veins().size());
-            } catch (IOException | InvalidConfigurationException | RuntimeException exception) {
-                text.send(sender, "reload.failed", "error", exception.getMessage());
-            }
+            AdminActions.Outcome outcome = actions.reload();
+            send(sender, messages, outcome);
             return true;
         }
         if (args.length == 1 && args[0].equalsIgnoreCase("status")) {
-            GeneratorSettings current = settings;
-            String worlds = current.enabledWorlds().isEmpty() ? text.get(sender, "status.all-worlds")
-                    : String.join(", ", current.enabledWorlds());
-            text.send(sender, "status.summary",
-                    "passes", current.veins().size(),
-                    "replace", current.replaceExistingOres(),
-                    "retrofit", current.retrofitExistingChunks(),
-                    "processed", retrofitter.processedChunks(),
-                    "manual", retrofitter.manuallyRegeneratedChunks(),
-                    "queued", retrofitter.queuedChunks(),
-                    "scanning", retrofitter.allScanRunning(),
-                    "worlds", worlds);
-            if (retrofitter.campaignActive()) {
-                text.send(sender, "status.regenerate-all",
-                        "done", retrofitter.campaignDone(), "remaining", retrofitter.campaignRemaining());
-            }
+            send(sender, text, actions.status(text.get(sender, "status.all-worlds")));
+            return true;
+        }
+        if (args.length == 1 && args[0].equalsIgnoreCase("web")) {
+            openWeb(sender, text);
             return true;
         }
         if (args.length >= 2 && args[0].equalsIgnoreCase("regenerate")) {
@@ -177,69 +227,46 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
     }
 
     private boolean handleRegenerate(CommandSender sender, String[] args, Messages text) {
-        int added;
         if (args.length == 2 && args[1].equalsIgnoreCase("loaded")) {
-            added = retrofitter.regenerateLoadedChunks();
+            send(sender, text, actions.regenerateLoaded());
         } else if (args.length == 2 && args[1].equalsIgnoreCase("all")) {
-            boolean started = retrofitter.regenerateAllChunks(result -> {
-                text.send(sender, "regenerate.all.scan-finished",
-                        "worlds", result.worlds(), "found", result.foundChunks(),
-                        "queued", result.queuedChunks(), "failed", result.failedRegionFiles());
-                text.send(sender, "regenerate.all.no-new-chunks");
-            }, false);
-            text.send(sender, started ? "regenerate.all.scanning" : "regenerate.all.already-running");
-            return true;
+            send(sender, text, actions.regenerateAll(finished -> send(sender, text, finished)));
         } else if (args.length == 2 && args[1].equalsIgnoreCase("cancel")) {
-            text.send(sender, retrofitter.cancelCampaign() ? "regenerate.cancel.done" : "regenerate.cancel.none");
-            return true;
+            send(sender, text, actions.cancel());
         } else if (args.length == 2) {
             if (!(sender instanceof Player player)) {
                 text.send(sender, "regenerate.radius.player-only");
                 return true;
             }
-            int radius;
-            try {
-                radius = Integer.parseInt(args[1]);
-            } catch (NumberFormatException exception) {
+            OptionalInt radius = AdminActions.parseRadius(args[1]);
+            if (radius.isEmpty()) {
                 text.send(sender, "regenerate.radius.not-a-number");
                 return true;
             }
-            if (radius < 0 || radius > 32) {
-                text.send(sender, "regenerate.radius.out-of-range");
-                return true;
-            }
-            added = retrofitter.regenerateNearbyChunks(player.getWorld(),
-                    player.getLocation().getBlockX() >> 4,
-                    player.getLocation().getBlockZ() >> 4, radius);
+            send(sender, text, actions.regenerateRadius(player, radius.getAsInt()));
         } else if (args.length == 5 && args[1].equalsIgnoreCase("chunk")) {
-            World world = Bukkit.getWorld(args[2]);
-            if (world == null) {
-                text.send(sender, "regenerate.chunk.unknown-world", "world", args[2]);
-                return true;
-            }
-            int chunkX;
-            int chunkZ;
-            try {
-                chunkX = Integer.parseInt(args[3]);
-                chunkZ = Integer.parseInt(args[4]);
-            } catch (NumberFormatException exception) {
-                text.send(sender, "regenerate.chunk.bad-coordinates");
-                return true;
-            }
-            if (!world.isChunkLoaded(chunkX, chunkZ)) {
-                text.send(sender, "regenerate.chunk.not-loaded");
-                return true;
-            }
-            added = retrofitter.regenerateChunk(world.getChunkAt(chunkX, chunkZ)) ? 1 : 0;
+            send(sender, text, actions.regenerateChunk(args[2], args[3], args[4]));
         } else {
             text.send(sender, "usage", "label", "oreveins");
-            return true;
-        }
-        text.send(sender, "regenerate.queued", "count", added);
-        if (added == 0) {
-            text.send(sender, "regenerate.nothing-queued");
         }
         return true;
+    }
+
+    private static void send(CommandSender sender, Messages text, AdminActions.Outcome outcome) {
+        for (AdminActions.Line line : outcome.lines()) {
+            text.send(sender, line.key(), line.placeholders());
+        }
+    }
+
+    private void openWeb(CommandSender sender, Messages text) {
+        WebIntegration current = web;
+        if (current == null) {
+            text.send(sender, "web.unavailable");
+        } else if (!(sender instanceof Player player)) {
+            text.send(sender, "web.player-only");
+        } else {
+            current.open(player);
+        }
     }
 
     @Override
@@ -247,7 +274,7 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
             @NotNull String alias, String @NotNull [] args) {
         List<String> options;
         if (args.length == 1) {
-            options = SUBCOMMANDS;
+            options = web != null ? SUBCOMMANDS_WITH_WEB : SUBCOMMANDS;
         } else if (args.length == 2 && args[0].equalsIgnoreCase("regenerate")) {
             options = REGENERATE_TARGETS;
         } else if (args.length == 3 && args[0].equalsIgnoreCase("regenerate") && args[1].equalsIgnoreCase("chunk")) {

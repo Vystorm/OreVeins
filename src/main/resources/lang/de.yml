@@ -62,3 +62,147 @@ retrofit:
 scan:
   region-file-failed: "{world}: Regionsdatei {path} konnte nicht gescannt werden: {error}"
   region-directory-failed: "{world}: Regionsordner {path} konnte nicht gescannt werden: {error}"
+
+# Optionale Webseite (nur mit Vystorm Core 0.24.0+ und dessen Web-Plattform).
+# Die Schlüssel unter web.ui. sind die Texte der Seite im Browser / Client-Overlay.
+web:
+  unavailable: "{prefix}Die Webseite braucht Vystorm Core 0.24.0 oder neuer mit Web-Plattform."
+  player-only: "{prefix}Nur ein Spieler kann die Webseite öffnen."
+  start-failed: "Die Webseite konnte nicht starten: {error}"
+  core-too-old: "Vystorm Core ist älter als {version} oder hat keine Web-Plattform; die Webseite ist aus."
+  registered: "Webseite registriert (Web-Plattform läuft: {active})."
+  action-log: "Web: {player} hat /oreveins {action} ausgeführt"
+  call-failed: "Webseite: {call} fehlgeschlagen: {error}"
+  module:
+    title: "Erzadern"
+    description: "Wo welches Erz in den Welten dieses Servers entsteht: Y-Höhen, Adergrößen und Häufigkeit."
+    admin-title: "OreVeins-Verwaltung"
+    admin-description: "Status und Regenerierung von OreVeins."
+  error:
+    offline: "Dafür musst du auf dem Server online sein."
+    no-permission: "Das darfst du nicht."
+  ui:
+    tab:
+      guide: "Erzführer"
+      admin: "Verwaltung"
+    loading: "Lädt …"
+    guide:
+      none: "Keine Welt mit OreVeins-Generierung ist geladen."
+      unavailable: "Der Erzführer ist noch nicht verfügbar. Versuch es gleich noch einmal."
+      world: "Welt"
+      env:
+        NORMAL: "Oberwelt"
+        NETHER: "Nether"
+      summary: "Y {min} bis {max} · {ores} Erzarten · {passes} Generierungsdurchläufe"
+      replaced: "Die eigenen Erze des Weltgenerators werden durch diese Adern ersetzt."
+      chart:
+        title: "Wo Erze entstehen"
+        caption: "Anteil jedes Erzes je Y-Höhe. Jede Zeile hat ihren eigenen Maßstab; die Zahl ist die Höchstmenge an Blöcken je Chunk."
+        axis: "Y-Höhe"
+        peak: "am meisten bei Y {y}"
+        at: "Y {y}: {value} Blöcke je Ebene"
+        none-at: "Y {y}: keine"
+        hover: "Y {y}"
+      geology: "Tiefe Geologie"
+      table:
+        title: "Generierungsdurchläufe"
+        ore: "Erz"
+        pass: "Durchlauf"
+        range: "Y-Bereich"
+        shape: "Verteilung"
+        size: "Adergröße"
+        frequency: "Adern"
+        blocks: "Blöcke / Chunk"
+        where: "Wo"
+      shape:
+        UNIFORM: "gleichmäßig"
+        TRIANGLE: "Spitze in der Mitte"
+      frequency:
+        per-chunk: "{value} je Chunk"
+        chunks-per-vein: "1 je {value} Chunks"
+      blocks:
+        value: "bis {value}"
+      biomes:
+        all: "alle Biome"
+        only: "nur in {biomes}"
+        badge: "Biome"
+      host:
+        OVERWORLD_BASE: "Stein, Tiefenschiefer, Tuff, Granit, Diorit, Andesit"
+        NETHER_BASE: "Netherrack, Basalt, Schwarzstein"
+        NETHERRACK: "Netherrack"
+      host-note: "Adern entstehen in {host}, außer ein Durchlauf nennt anderes Gestein."
+      note: "Blöcke je Chunk ist die Höchstmenge; Wirtsgestein, Biome und Höhlen machen die echte Menge kleiner."
+    ore:
+      coal: "Kohle"
+      iron: "Eisen"
+      copper: "Kupfer"
+      gold: "Gold"
+      redstone: "Redstone"
+      lapis: "Lapislazuli"
+      diamond: "Diamant"
+      emerald: "Smaragd"
+      nether_quartz: "Netherquarz"
+      nether_gold: "Nethergold"
+      ancient_debris: "Antiker Schrott"
+      obsidian: "Obsidian"
+      magma_block: "Magma"
+      lava: "Verborgene Lava"
+    admin:
+      status: "Status"
+      loading: "Status lädt …"
+      passes: "Generierungsdurchläufe"
+      replace: "Generator-Erze ersetzen"
+      retrofit: "Alte Chunks beim Laden nachrüsten"
+      speed: "Abschnitte je Tick"
+      retrofit-version: "Nachrüst-Version"
+      worlds:
+        label: "Welten"
+        all: "alle Oberwelt- und Nether-Welten"
+      language: "Sprache"
+      legacy: "config.yml hat keine config-version (2.5.0 oder älter): fehlende Schlüssel nutzen das hohe Iris-Preset."
+      state:
+        enabled: "ja"
+        disabled: "nein"
+      counters: "Arbeit seit dem letzten Start"
+      processed: "Regenerierte Chunks"
+      manual: "davon per Befehl"
+      queued: "Chunks in der Warteschlange"
+      rate:
+        label: "Tempo"
+        value: "{value} Chunks/min"
+        idle: "untätig"
+      campaign:
+        label: "regenerate all"
+        none: "Läuft nicht."
+        scanning: "Liest die Regionsdateien …"
+        progress: "{done} fertig, {remaining} übrig"
+        eta: "noch etwa {time}"
+        resumes: "Übersteht Neustarts und läuft automatisch weiter."
+      last-scan: "Letzter Scan: {found} Chunks in {worlds} Welt(en) gefunden, {queued} eingereiht, {failed} unlesbare Regionsdateien."
+      actions: "Aktionen"
+      warning: "Regenerieren entfernt jeden Erzblock im Chunk (auch von Spielern gesetzte) und erzeugt die Erze neu. Vorher ein Backup machen."
+      reload:
+        label: "Konfiguration neu laden"
+        confirm: "config.yml und die Sprachdateien neu laden? Bei einem Fehler bleiben die bisherigen Einstellungen aktiv."
+      all:
+        label: "Alle Chunks regenerieren"
+        confirm: "Jeden Chunk, der in den aktivierten Welten auf der Platte liegt, regenerieren? Das läuft lange im Hintergrund und übersteht Neustarts."
+      loaded:
+        label: "Geladene Chunks regenerieren"
+        confirm: "Jeden gerade geladenen Chunk in den aktivierten Welten regenerieren?"
+      radius:
+        label: "Um mich herum regenerieren"
+        input: "Radius in Chunks"
+        confirm: "Die geladenen Chunks im Umkreis von {radius} Chunks um deine Position regenerieren?"
+        offline: "Nur solange du online bist."
+      cancel:
+        label: "regenerate all abbrechen"
+        confirm: "Das laufende regenerate all abbrechen und seinen Fortschritt verwerfen?"
+      confirm: "Bestätigen"
+      done: "Erledigt"
+      refused: "Nicht ausgeführt"
+      settings-hint: "Einstellungen stehen in plugins/OreVeins/config.yml; dort ändern und neu laden."
+    duration:
+      hours: "{h} h {m} min"
+      minutes: "{m} min"
+      days: "{d} T {h} h"

@@ -6,10 +6,12 @@ authors: [Kevin Mendoza, Esoren]
 website: https://github.com/Vystorm/OreVeins
 api-version: '26.2'
 load: STARTUP
+# Optional: Vystorm Core 0.24.0+ adds a web page (ore guide and admin panel).
+softdepend: [vystorm_core]
 commands:
   oreveins:
     description: Reloads, displays, or selectively regenerates OreVeins chunks.
-    usage: /oreveins <reload|status|regenerate <all|cancel|loaded|radius|chunk world x z>>
+    usage: /oreveins <reload|status|web|regenerate <all|cancel|loaded|radius|chunk world x z>>
     permission: oreveins.admin
 permissions:
   oreveins.admin:

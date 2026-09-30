@@ -34,7 +34,8 @@ same license: **GPL-2.0-or-later** (see [LICENSE](LICENSE) and [NOTICE](NOTICE))
   A full-world run survives restarts.
 - **English and German** messages; German is picked automatically for
   players whose client language is German.
-- No dependencies.
+- No dependencies. Optional: with [Vystorm Core](#web-page-optional) a web
+  page shows an ore guide to players and an admin panel.
 
 ## Requirements
 
@@ -67,6 +68,7 @@ All commands need `oreveins.admin` (default: op).
 | `/oreveins regenerate chunk <world> <x> <z>` | Regenerates one loaded chunk (chunk coordinates). Never loads or generates a chunk. |
 | `/oreveins regenerate all` | Regenerates every chunk that exists on disk in all enabled overworld and Nether worlds (see below). |
 | `/oreveins regenerate cancel` | Cancels a running `regenerate all` and discards its progress. |
+| `/oreveins web` | Opens the web page (admin tab), only with Vystorm Core, see below. |
 
 "Regenerate" removes all ore blocks and the deep source lava of the
 configured lava pass from the chunk and generates only those two categories
@@ -139,6 +141,36 @@ longer. Raising `retrofit-sections-per-tick` (max 8) speeds this up at the
 cost of more work per tick. Keep an eye on TPS and run large jobs when few
 players are online.
 
+## Web page (optional)
+
+OreVeins runs without any other plugin. When **Vystorm Core 0.24.0 or newer**
+is installed and its web platform is enabled (`web.enabled: true` in Core's
+config), OreVeins adds a page to Core's web interface. Players open it in the
+browser (`/web oreveins` gives a login link) or, with the free Vystorm client
+mod, as an in-game overlay.
+
+- **Ore guide** (every web user): one tab per enabled overworld and Nether
+  world, a chart of where each ore spawns (share per Y level, with a hover
+  readout), and a table of all generation passes: Y range scaled to the world,
+  spread, vein size, veins per chunk, most blocks per chunk, biome limits and
+  host rock. The data comes from the loaded config and worlds and is refreshed
+  after `/oreveins reload` and when worlds load or unload.
+- **Admin panel** (`oreveins.admin`): the numbers of `/oreveins status`, live
+  progress of a running `regenerate all` (speed and time left, pushed to the
+  page, no polling), and buttons for reload, `regenerate all`, `regenerate
+  loaded`, `regenerate <radius>` around yourself (only while online) and
+  `regenerate cancel`. Every button asks for confirmation first; the server
+  runs the same code as the command, checks the permission again and logs
+  each action to the console.
+- `/oreveins web` opens the admin tab in the overlay or sends a login link.
+
+Web texts are in the same language files (`lang/en.yml`, `lang/de.yml`,
+keys below `web.`). With Vystorm Core present, OreVeins creates
+`plugins/OreVeins/lang/en.yml` and `de.yml` as comment-only files, so Core does
+not copy the full bundled texts there; add single keys to override them as
+before. Without Vystorm Core (or with an older one) nothing of this is loaded
+and OreVeins behaves exactly as without the web page.
+
 ## Building
 
 Requires JDK 25 and Gradle 9.1 or newer:
@@ -148,6 +180,18 @@ gradle clean test build
 ```
 
 The jar is written to `build/libs/OreVeins-<version>.jar`.
+
+The optional web page (source set `src/vystorm/`) is compiled against the
+Vystorm Core jar, which is not published in a Maven repository. It is built
+into the jar only when a Core jar (0.24.0 or newer) is available, either
+
+- as a Gradle property: `gradle build -PvystormCoreJar=/path/to/Vystorm_Core-0.24.0.jar`
+  (or `vystormCoreJar=...` in `~/.gradle/gradle.properties`), or
+- as a file `libs/Vystorm_Core*.jar` in this directory (`libs/` is git-ignored).
+
+Without it the build prints "building without the optional web page" and the
+jar works exactly the same, just without the page. The page itself (the web
+UI) lives in the Vystorm web UI project and ships with Vystorm Core.
 
 ## Credits and license
 

@@ -19,3 +19,6 @@ server-verification/
 
 # Local test servers
 run/
+
+# Local Vystorm Core jar for the optional web page (not public)
+libs/

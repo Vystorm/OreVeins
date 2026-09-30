@@ -62,3 +62,147 @@ retrofit:
 scan:
   region-file-failed: "{world}: could not scan region file {path}: {error}"
   region-directory-failed: "{world}: could not scan region directory {path}: {error}"
+
+# Optional web page (only used with Vystorm Core 0.24.0+ and its web platform).
+# Keys below web.ui. are the texts of the page in the browser / client overlay.
+web:
+  unavailable: "{prefix}The web page needs Vystorm Core 0.24.0 or newer with its web platform."
+  player-only: "{prefix}Only a player can open the web page."
+  start-failed: "Could not start the web page: {error}"
+  core-too-old: "Vystorm Core is older than {version} or lacks the web platform; the web page is off."
+  registered: "Web page registered (web platform running: {active})."
+  action-log: "Web: {player} ran /oreveins {action}"
+  call-failed: "Web page {call} failed: {error}"
+  module:
+    title: "Ore veins"
+    description: "Where each ore spawns in this server's worlds: Y levels, vein sizes and how often."
+    admin-title: "OreVeins admin"
+    admin-description: "Status and regeneration of OreVeins."
+  error:
+    offline: "You need to be online on the server for this."
+    no-permission: "You are not allowed to do this."
+  ui:
+    tab:
+      guide: "Ore guide"
+      admin: "Admin"
+    loading: "Loading…"
+    guide:
+      none: "No world with OreVeins generation is loaded."
+      unavailable: "The ore guide is not available yet. Try again in a moment."
+      world: "World"
+      env:
+        NORMAL: "Overworld"
+        NETHER: "Nether"
+      summary: "Y {min} to {max} · {ores} ore types · {passes} generation passes"
+      replaced: "The world generator's own ores are replaced by these veins."
+      chart:
+        title: "Where ores spawn"
+        caption: "Share of each ore per Y level. Every row has its own scale; the number is the most blocks per chunk."
+        axis: "Y level"
+        peak: "most at Y {y}"
+        at: "Y {y}: {value} blocks per level"
+        none-at: "Y {y}: none"
+        hover: "Y {y}"
+      geology: "Deep geology"
+      table:
+        title: "Generation passes"
+        ore: "Ore"
+        pass: "Pass"
+        range: "Y range"
+        shape: "Spread"
+        size: "Vein size"
+        frequency: "Veins"
+        blocks: "Blocks / chunk"
+        where: "Where"
+      shape:
+        UNIFORM: "even"
+        TRIANGLE: "peak in the middle"
+      frequency:
+        per-chunk: "{value} per chunk"
+        chunks-per-vein: "1 per {value} chunks"
+      blocks:
+        value: "up to {value}"
+      biomes:
+        all: "all biomes"
+        only: "only in {biomes}"
+        badge: "biomes"
+      host:
+        OVERWORLD_BASE: "stone, deepslate, tuff, granite, diorite, andesite"
+        NETHER_BASE: "netherrack, basalt, blackstone"
+        NETHERRACK: "netherrack"
+      host-note: "Veins grow in {host} unless a pass names other rock."
+      note: "Blocks per chunk is the most a chunk can get; host rock, biomes and caves make the real amount lower."
+    ore:
+      coal: "Coal"
+      iron: "Iron"
+      copper: "Copper"
+      gold: "Gold"
+      redstone: "Redstone"
+      lapis: "Lapis lazuli"
+      diamond: "Diamond"
+      emerald: "Emerald"
+      nether_quartz: "Nether quartz"
+      nether_gold: "Nether gold"
+      ancient_debris: "Ancient debris"
+      obsidian: "Obsidian"
+      magma_block: "Magma"
+      lava: "Buried lava"
+    admin:
+      status: "Status"
+      loading: "Loading status…"
+      passes: "Generation passes"
+      replace: "Replace generator ores"
+      retrofit: "Retrofit old chunks when they load"
+      speed: "Sections per tick"
+      retrofit-version: "Retrofit version"
+      worlds:
+        label: "Worlds"
+        all: "all overworld and Nether worlds"
+      language: "Language"
+      legacy: "config.yml has no config-version (2.5.0 or older): missing keys use the tall Iris preset."
+      state:
+        enabled: "yes"
+        disabled: "no"
+      counters: "Work since the last start"
+      processed: "Chunks regenerated"
+      manual: "of them by command"
+      queued: "Queued chunks"
+      rate:
+        label: "Speed"
+        value: "{value} chunks/min"
+        idle: "idle"
+      campaign:
+        label: "regenerate all"
+        none: "Not running."
+        scanning: "Reading the region files…"
+        progress: "{done} done, {remaining} remaining"
+        eta: "about {time} left"
+        resumes: "Survives restarts and resumes automatically."
+      last-scan: "Last scan: {found} chunks found in {worlds} world(s), {queued} queued, {failed} unreadable region files."
+      actions: "Actions"
+      warning: "Regenerating removes every ore block in the chunk (also ore blocks players placed) and generates the ores again. Make a backup first."
+      reload:
+        label: "Reload config"
+        confirm: "Reload config.yml and the language files? On an error the previous settings stay active."
+      all:
+        label: "Regenerate all chunks"
+        confirm: "Regenerate every chunk that exists on disk in all enabled worlds? This runs in the background for a long time and survives restarts."
+      loaded:
+        label: "Regenerate loaded chunks"
+        confirm: "Regenerate every chunk that is loaded right now in all enabled worlds?"
+      radius:
+        label: "Regenerate around me"
+        input: "Radius in chunks"
+        confirm: "Regenerate the loaded chunks within {radius} chunks around your position?"
+        offline: "Only while you are online."
+      cancel:
+        label: "Cancel regenerate all"
+        confirm: "Cancel the running regenerate all and discard its progress?"
+      confirm: "Confirm"
+      done: "Done"
+      refused: "Not done"
+      settings-hint: "Settings are in plugins/OreVeins/config.yml; change them there and reload."
+    duration:
+      hours: "{h} h {m} min"
+      minutes: "{m} min"
+      days: "{d} d {h} h"

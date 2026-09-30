@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.7.0 (2026-09-30)
+
+- Optional web page for Vystorm Core 0.24.0+ (soft dependency `vystorm_core`):
+  a public ore guide (Y distribution chart and pass table per world, from the
+  loaded config) and an admin panel for `oreveins.admin` with live
+  `regenerate all` progress, reload, regenerate all/loaded/radius and cancel.
+  Without Vystorm Core nothing changes.
+- New command `/oreveins web` (opens the page; without Vystorm Core it says so).
+- The admin commands and the web page share one implementation, so checks and
+  feedback texts are identical.
+- Web texts in `lang/en.yml` and `lang/de.yml` below `web.`.
+- Build: the web integration is an optional source set, compiled only when a
+  Vystorm Core jar is configured (see README, "Building").
+
 ## 2.6.0 (2026-09-30)
 
 First public release of the maintained fork.

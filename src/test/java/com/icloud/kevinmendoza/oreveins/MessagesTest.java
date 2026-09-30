@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class MessagesTest {
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{[a-z]+}");
     private static final Pattern KEY_LITERAL = Pattern.compile(
-            "\"((?:startup|config|reload|status|regenerate|retrofit|scan)\\.[a-z.-]+|usage)\"");
+            "\"((?:startup|config|reload|status|regenerate|retrofit|scan|web)\\.[a-z.-]+|usage)\"");
 
     @Test
     void germanAndEnglishHaveTheSameKeysAndPlaceholders() {
@@ -42,7 +42,9 @@ class MessagesTest {
     void everyKeyUsedInTheCodeExists() throws IOException {
         Set<String> english = leafKeys(Messages.bundled("en").bundle("en"));
         Set<String> used = new TreeSet<>();
-        try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
+        // src/vystorm holds the optional web integration; it uses the same bundle.
+        try (Stream<Path> files = Stream.of("src/main/java", "src/vystorm/java").map(Path::of)
+                .filter(Files::isDirectory).flatMap(MessagesTest::walk)) {
             for (Path file : files.filter(path -> path.toString().endsWith(".java")).toList()) {
                 Matcher matcher = KEY_LITERAL.matcher(Files.readString(file));
                 while (matcher.find()) {
@@ -56,6 +58,34 @@ class MessagesTest {
         for (String key : used) {
             assertTrue(english.contains(key), "missing message key " + key);
         }
+    }
+
+    private static Stream<Path> walk(Path root) {
+        try {
+            return Files.walk(root);
+        } catch (IOException exception) {
+            throw new java.io.UncheckedIOException(exception);
+        }
+    }
+
+    @Test
+    void webRequestsUseTheFixedLanguageElseTheirCode() {
+        Messages auto = Messages.bundled("auto");
+        assertEquals("de", auto.languageForCode("de"));
+        assertEquals("de", auto.languageForCode("de_at"));
+        assertEquals("en", auto.languageForCode("fr"));
+        assertEquals("en", auto.languageForCode(null));
+        assertEquals("en", Messages.bundled("en").languageForCode("de"));
+        assertEquals("de", Messages.bundled("de").languageForCode("en"));
+    }
+
+    @Test
+    void plainTextsHaveNoChatPrefix() {
+        Messages messages = Messages.bundled("auto");
+        assertEquals("Queued 3 loaded chunk(s). Only ores and configured deep source lava will be regenerated.",
+                messages.plain("en", "regenerate.queued", "count", 3));
+        assertEquals("No cancellable regenerate all is running (or its scan is still in progress).",
+                messages.plain("en", "regenerate.cancel.none"));
     }
 
     @Test
