@@ -1,0 +1,42 @@
+OreVeins
+SPDX-License-Identifier: GPL-2.0-or-later
+
+Original work:
+  OreVeins 1.2B for Bukkit
+  Copyright (C) 2014  Kevin Mendoza
+  Major Contributors: Kevin Song, Alex Lin, Darren Chang, Drew Parliament, Zeno Hao
+  Released under the GNU General Public License, version 2 or (at your
+  option) any later version.
+
+Modified work:
+  OreVeins 2.x for Paper/Purpur 26.2
+  Copyright (C) 2026  Esoren
+  Source: https://github.com/Vystorm/OreVeins
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+Major changes compared with the original (2026, Esoren):
+  - Rewritten for the Paper/Purpur 26.2 API and Java 25; the original 2014
+    code was used as a reference only.
+  - Generation runs in a BlockPopulator on the LimitedRegion; no asynchronous
+    world access and no fixed 128-block world height.
+  - Vein passes are defined in config.yml (material, host rock, attempts,
+    size, Y range, distribution, biomes, spawn chance, air-exposure discard);
+    Y values scale to each world's real height.
+  - The generator's own overworld and Nether ores are removed first; removed
+    blocks are filled with the dominant neighbouring block.
+  - Deepslate ore variants, deep obsidian/magma/lava bodies.
+  - One-time retrofit of existing chunks, manual regeneration commands and a
+    restart-safe "regenerate all" over every chunk on disk.
+  - English and German messages.

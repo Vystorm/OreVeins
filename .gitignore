@@ -1,0 +1,21 @@
+# Build output
+build/
+.gradle/
+out/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Local reference material, never published
+legacy-decompiled/
+original/
+server-verification/
+
+# Local test servers
+run/

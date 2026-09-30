@@ -1,0 +1,17 @@
+name: OreVeins
+version: '${version}'
+main: com.icloud.kevinmendoza.oreveins.OreVeinsPlugin
+description: Configurable ore vein generation for Paper and Purpur 26.2 worlds.
+authors: [Kevin Mendoza, Esoren]
+website: https://github.com/Vystorm/OreVeins
+api-version: '26.2'
+load: STARTUP
+commands:
+  oreveins:
+    description: Reloads, displays, or selectively regenerates OreVeins chunks.
+    usage: /oreveins <reload|status|regenerate <all|cancel|loaded|radius|chunk world x z>>
+    permission: oreveins.admin
+permissions:
+  oreveins.admin:
+    description: Allows OreVeins administration.
+    default: op

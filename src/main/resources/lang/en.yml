@@ -1,0 +1,64 @@
+# OreVeins messages - English (default and fallback for every missing key).
+# To change single texts, create plugins/OreVeins/lang/en.yml containing only
+# the keys you want to override. {name} placeholders are filled in by the
+# plugin; {prefix} inserts the "prefix" text below.
+prefix: "[OreVeins] "
+
+usage: "{prefix}Usage: /{label} <reload|status|regenerate <all|cancel|loaded|<radius>|chunk <world> <x> <z>>>"
+
+startup:
+  failed: "OreVeins cannot start: {error}"
+  legacy-config: "config.yml has no config-version (written by OreVeins 2.5.0 or older): keys it does not set keep using the tall Iris preset defaults, exactly as before."
+  loaded: "Loaded {count} vein passes."
+  retrofit-on: "Existing chunks are retrofitted once per retrofit-version (currently {version}) when they load."
+  retrofit-off: "Retrofit of existing chunks is off; only newly generated chunks get OreVeins veins."
+  attached: "Attached ore generation to {world} (height {min}..{max})."
+
+config:
+  unknown-environment: "Ignoring unknown reference environment: {environment}"
+  missing-reference: "no reference-heights entry for {environment}"
+  invalid-vein: "Invalid vein entry '{id}': {error}"
+  no-veins: "No valid vein definitions were loaded"
+
+reload:
+  done: "{prefix}{count} generation passes reloaded."
+  failed: "{prefix}Reload failed; the previous settings remain active: {error}"
+
+status:
+  all-worlds: "all normal/nether worlds"
+  summary: "{prefix}{passes} passes, replace-existing={replace}, retrofit={retrofit}, processed={processed}, manual={manual}, queued={queued}, all-scan={scanning}, worlds={worlds}"
+  regenerate-all: "{prefix}regenerate all is running (survives restarts): {done} done, {remaining} remaining."
+
+regenerate:
+  queued: "{prefix}Queued {count} loaded chunk(s). Only ores and configured deep source lava will be regenerated."
+  nothing-queued: "{prefix}Matching chunks may already be queued or belong to a disabled world."
+  all:
+    scanning: "{prefix}Scanning all existing overworld and nether region files in the background..."
+    already-running: "{prefix}An all-chunk scan is already running."
+    scan-finished: "{prefix}All-chunk scan finished across {worlds} world(s): found {found}, queued {queued}, unreadable region files {failed}."
+    no-new-chunks: "{prefix}Existing chunks will be loaded one at a time; no new chunks are generated."
+    resumed: "Resumed regenerate all: {done} chunks already done, {queued} of {found} queued."
+    resume-failed: "Could not resume the interrupted regenerate all."
+    store-failed: "Could not store regenerate all progress"
+    record-failed: "Could not record regenerate all progress"
+    delete-failed: "Could not delete regenerate all progress files"
+    finished-log: "Regenerate all finished: {done} chunks regenerated."
+  cancel:
+    done: "{prefix}regenerate all cancelled; its progress was discarded."
+    none: "{prefix}No cancellable regenerate all is running (or its scan is still in progress)."
+  radius:
+    player-only: "{prefix}A radius can only be used by a player. Use 'regenerate loaded' from the console."
+    not-a-number: "{prefix}The radius must be a whole number from 0 to 32."
+    out-of-range: "{prefix}The radius must be between 0 and 32 chunks."
+  chunk:
+    unknown-world: "{prefix}Unknown world '{world}'."
+    bad-coordinates: "{prefix}Chunk coordinates must be whole numbers."
+    not-loaded: "{prefix}That chunk is not loaded; this command never loads or generates chunks."
+
+retrofit:
+  progress: "Retrofitted {processed} existing chunks; {queued} queued."
+  failed: "Could not retrofit chunk {x},{z} in {world}"
+
+scan:
+  region-file-failed: "{world}: could not scan region file {path}: {error}"
+  region-directory-failed: "{world}: could not scan region directory {path}: {error}"

@@ -1,0 +1,64 @@
+# OreVeins-Meldungen - Deutsch. Fehlende Schlüssel fallen auf Englisch zurück.
+# Einzelne Texte lassen sich mit plugins/OreVeins/lang/de.yml überschreiben,
+# die nur die geänderten Schlüssel enthält. {name}-Platzhalter füllt das
+# Plugin; {prefix} fügt den Text von "prefix" ein.
+prefix: "[OreVeins] "
+
+usage: "{prefix}Verwendung: /{label} <reload|status|regenerate <all|cancel|loaded|<radius>|chunk <welt> <x> <z>>>"
+
+startup:
+  failed: "OreVeins kann nicht starten: {error}"
+  legacy-config: "config.yml hat keine config-version (geschrieben von OreVeins 2.5.0 oder älter): Nicht gesetzte Schlüssel verwenden wie bisher die Standardwerte des hohen Iris-Presets."
+  loaded: "{count} Adern-Pässe geladen."
+  retrofit-on: "Bestehende Chunks werden beim Laden einmal je retrofit-version (aktuell {version}) nachgerüstet."
+  retrofit-off: "Nachrüsten bestehender Chunks ist aus; nur neu erzeugte Chunks erhalten OreVeins-Adern."
+  attached: "Erzgenerierung an {world} angehängt (Höhe {min}..{max})."
+
+config:
+  unknown-environment: "Unbekannte Referenz-Umgebung wird ignoriert: {environment}"
+  missing-reference: "kein reference-heights-Eintrag für {environment}"
+  invalid-vein: "Ungültiger Adern-Eintrag '{id}': {error}"
+  no-veins: "Es wurden keine gültigen Adern-Definitionen geladen"
+
+reload:
+  done: "{prefix}{count} Generierungs-Pässe neu geladen."
+  failed: "{prefix}Neuladen fehlgeschlagen; die bisherigen Einstellungen bleiben aktiv: {error}"
+
+status:
+  all-worlds: "alle Oberwelt-/Nether-Welten"
+  summary: "{prefix}{passes} Pässe, Erze ersetzen={replace}, Nachrüsten={retrofit}, bearbeitet={processed}, manuell={manual}, in Warteschlange={queued}, Gesamtscan={scanning}, Welten={worlds}"
+  regenerate-all: "{prefix}regenerate all läuft (übersteht Neustarts): {done} erledigt, {remaining} verbleibend."
+
+regenerate:
+  queued: "{prefix}{count} geladene(r) Chunk(s) eingereiht. Nur Erze und konfigurierte tiefe Lavaquellen werden neu erzeugt."
+  nothing-queued: "{prefix}Passende Chunks sind eventuell schon eingereiht oder gehören zu einer deaktivierten Welt."
+  all:
+    scanning: "{prefix}Alle vorhandenen Oberwelt- und Nether-Regionsdateien werden im Hintergrund gescannt..."
+    already-running: "{prefix}Ein Scan aller Chunks läuft bereits."
+    scan-finished: "{prefix}Scan aller Chunks über {worlds} Welt(en) fertig: {found} gefunden, {queued} eingereiht, {failed} unlesbare Regionsdateien."
+    no-new-chunks: "{prefix}Bestehende Chunks werden einzeln geladen; es werden keine neuen Chunks erzeugt."
+    resumed: "regenerate all fortgesetzt: {done} Chunks bereits erledigt, {queued} von {found} eingereiht."
+    resume-failed: "Das unterbrochene regenerate all konnte nicht fortgesetzt werden."
+    store-failed: "Fortschritt von regenerate all konnte nicht gespeichert werden"
+    record-failed: "Fortschritt von regenerate all konnte nicht vermerkt werden"
+    delete-failed: "Fortschrittsdateien von regenerate all konnten nicht gelöscht werden"
+    finished-log: "regenerate all abgeschlossen: {done} Chunks neu erzeugt."
+  cancel:
+    done: "{prefix}regenerate all abgebrochen; der Fortschritt wurde verworfen."
+    none: "{prefix}Kein abbrechbares regenerate all aktiv (oder der Scan läuft noch)."
+  radius:
+    player-only: "{prefix}Ein Radius ist nur für Spieler möglich. Nutze 'regenerate loaded' in der Konsole."
+    not-a-number: "{prefix}Der Radius muss eine ganze Zahl von 0 bis 32 sein."
+    out-of-range: "{prefix}Der Radius muss zwischen 0 und 32 Chunks liegen."
+  chunk:
+    unknown-world: "{prefix}Unbekannte Welt '{world}'."
+    bad-coordinates: "{prefix}Chunk-Koordinaten müssen ganze Zahlen sein."
+    not-loaded: "{prefix}Dieser Chunk ist nicht geladen; der Befehl lädt oder erzeugt nie Chunks."
+
+retrofit:
+  progress: "{processed} bestehende Chunks nachgerüstet; {queued} in Warteschlange."
+  failed: "Chunk {x},{z} in {world} konnte nicht nachgerüstet werden"
+
+scan:
+  region-file-failed: "{world}: Regionsdatei {path} konnte nicht gescannt werden: {error}"
+  region-directory-failed: "{world}: Regionsordner {path} konnte nicht gescannt werden: {error}"

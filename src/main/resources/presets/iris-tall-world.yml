@@ -1,0 +1,376 @@
+# OreVeins preset: tall Iris worlds (overworld Y -256..511, Nether Y -256..511)
+#
+# This is the configuration the plugin shipped as its default up to 2.5.0. It
+# is tuned for Iris-generated worlds with extended build height and uses Iris
+# cave biome keys (carving/drip*) next to the vanilla dripstone_caves key.
+#
+# Use it: copy this file over plugins/OreVeins/config.yml, adjust
+# enabled-worlds, then run /oreveins reload (or restart).
+#
+# OreVeins rewrites plugins/OreVeins/presets/ on every start, so edit the copy,
+# not this file.
+#
+# Compatibility: a config.yml without a "config-version" key (written by
+# OreVeins 2.5.0 or older) uses this preset for every key it does not set,
+# exactly as those versions did.
+config-version: 1
+
+# auto = German for players whose client language is German, English for
+# everyone else and for the console. en / de force one language everywhere.
+language: auto
+
+# An empty enabled-worlds list enables every NORMAL and NETHER world. New chunks
+# are handled during generation; existing chunks can be retrofitted once per
+# retrofit-version when loaded. replace-existing-ores removes the generator's
+# original ores first.
+# This is required for Iris worlds, otherwise both ore sets would stack.
+settings:
+  enabled-worlds: []
+  replace-existing-ores: true
+  # Existing chunks are converted once per retrofit-version when loaded. The
+  # marker is stored in the chunk itself, so later visits do not repeat it.
+  retrofit-existing-chunks: true
+  # Number of 16-block-high chunk sections handled per tick (1 is safest).
+  retrofit-sections-per-tick: 1
+  retrofit-version: 2
+
+# Y coordinates below match a tall Iris overworld and Iris Nether. The
+# Nether spans Y -256..511. Values are proportionally scaled only when another
+# world uses different min/max heights, then clamped to its real build limits.
+reference-heights:
+  NORMAL:
+    min-y: -256
+    max-y: 512
+  NETHER:
+    min-y: -256
+    max-y: 512
+
+# All ordinary ore sizes stay exactly 3x vanilla/Ore-Control defaults. Overworld
+# attempt counts remain at 30% of the previous frequency. Nether attempts are
+# doubled from the previous OreVeins values. Fractional counts are rolled
+# probabilistically per chunk.
+veins:
+  - id: coal-upper
+    environment: NORMAL
+    material: COAL_ORE
+    deepslate-material: DEEPSLATE_COAL_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 4.5
+    size: 51
+    min-y: 144
+    max-y: 511
+    distribution: UNIFORM
+
+  - id: coal-lower
+    environment: NORMAL
+    material: COAL_ORE
+    deepslate-material: DEEPSLATE_COAL_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 3
+    size: 51
+    min-y: -128
+    max-y: 256
+    distribution: TRIANGLE
+
+  - id: iron-upper
+    environment: NORMAL
+    material: IRON_ORE
+    deepslate-material: DEEPSLATE_IRON_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 13.5
+    size: 27
+    min-y: 32
+    max-y: 640
+    distribution: TRIANGLE
+
+  - id: iron-middle
+    environment: NORMAL
+    material: IRON_ORE
+    deepslate-material: DEEPSLATE_IRON_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 1.5
+    size: 27
+    min-y: -176
+    max-y: -16
+    distribution: TRIANGLE
+
+  - id: iron-small
+    environment: NORMAL
+    material: IRON_ORE
+    deepslate-material: DEEPSLATE_IRON_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 1.5
+    size: 12
+    min-y: -256
+    max-y: 16
+    distribution: UNIFORM
+
+  - id: copper
+    environment: NORMAL
+    material: COPPER_ORE
+    deepslate-material: DEEPSLATE_COPPER_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 2.4
+    size: 30
+    min-y: -160
+    max-y: 96
+    distribution: TRIANGLE
+
+  - id: copper-large-dripstone
+    environment: NORMAL
+    material: COPPER_ORE
+    deepslate-material: DEEPSLATE_COPPER_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 2.4
+    size: 60
+    min-y: -160
+    max-y: 96
+    distribution: TRIANGLE
+    biomes:
+      - minecraft:dripstone_caves
+      - carving/drip
+      - carving/drip-child
+      - carving/drip-lite
+      - carving/drip-lite-child
+
+  - id: gold
+    environment: NORMAL
+    material: GOLD_ORE
+    deepslate-material: DEEPSLATE_GOLD_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.6
+    size: 27
+    min-y: -256
+    max-y: -64
+    distribution: TRIANGLE
+
+  - id: gold-lower
+    environment: NORMAL
+    material: GOLD_ORE
+    deepslate-material: DEEPSLATE_GOLD_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.075
+    size: 27
+    min-y: -256
+    max-y: -224
+    distribution: UNIFORM
+
+  - id: gold-extra-badlands
+    environment: NORMAL
+    material: GOLD_ORE
+    deepslate-material: DEEPSLATE_GOLD_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 7.5
+    size: 27
+    min-y: -64
+    max-y: 384
+    distribution: UNIFORM
+    biomes: [minecraft:badlands, minecraft:eroded_badlands, minecraft:wooded_badlands]
+
+  - id: redstone
+    environment: NORMAL
+    material: REDSTONE_ORE
+    deepslate-material: DEEPSLATE_REDSTONE_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.6
+    size: 24
+    min-y: -256
+    max-y: -98
+    distribution: UNIFORM
+
+  - id: redstone-lower
+    environment: NORMAL
+    material: REDSTONE_ORE
+    deepslate-material: DEEPSLATE_REDSTONE_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 1.2
+    size: 24
+    min-y: -320
+    max-y: -192
+    distribution: TRIANGLE
+
+  - id: diamond
+    environment: NORMAL
+    material: DIAMOND_ORE
+    deepslate-material: DEEPSLATE_DIAMOND_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 1.05
+    size: 12
+    min-y: -416
+    max-y: -96
+    distribution: TRIANGLE
+
+  - id: diamond-medium
+    environment: NORMAL
+    material: DIAMOND_ORE
+    deepslate-material: DEEPSLATE_DIAMOND_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.3
+    size: 24
+    min-y: -256
+    max-y: -136
+    distribution: UNIFORM
+
+  - id: diamond-large
+    environment: NORMAL
+    material: DIAMOND_ORE
+    deepslate-material: DEEPSLATE_DIAMOND_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.15
+    spawn-chance: 0.1111111111
+    size: 36
+    min-y: -416
+    max-y: -96
+    distribution: TRIANGLE
+
+  - id: diamond-buried
+    environment: NORMAL
+    material: DIAMOND_ORE
+    deepslate-material: DEEPSLATE_DIAMOND_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.6
+    size: 24
+    min-y: -416
+    max-y: -96
+    distribution: TRIANGLE
+
+  - id: lapis
+    environment: NORMAL
+    material: LAPIS_ORE
+    deepslate-material: DEEPSLATE_LAPIS_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.3
+    size: 21
+    min-y: -192
+    max-y: -64
+    distribution: TRIANGLE
+
+  - id: lapis-buried
+    environment: NORMAL
+    material: LAPIS_ORE
+    deepslate-material: DEEPSLATE_LAPIS_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.6
+    size: 21
+    min-y: -256
+    max-y: 0
+    distribution: UNIFORM
+
+  - id: emerald-mountains
+    environment: NORMAL
+    material: EMERALD_ORE
+    deepslate-material: DEEPSLATE_EMERALD_ORE
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 15
+    size: 9
+    min-y: -160
+    max-y: 832
+    distribution: TRIANGLE
+    biomes:
+      - minecraft:cherry_grove
+      - minecraft:frozen_peaks
+      - minecraft:grove
+      - minecraft:jagged_peaks
+      - minecraft:meadow
+      - minecraft:snowy_slopes
+      - minecraft:stony_peaks
+      - minecraft:windswept_forest
+      - minecraft:windswept_gravelly_hills
+      - minecraft:windswept_hills
+
+  # Large, deep geology veins: deliberately rare so the underground is not
+  # plastered with them. Lava is always buried; exposed placements are skipped.
+  - id: deep-obsidian
+    environment: NORMAL
+    material: OBSIDIAN
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.24
+    size: 576
+    min-y: -240
+    max-y: -64
+    distribution: UNIFORM
+    discard-on-air-exposure: 0.35
+
+  - id: deep-magma
+    environment: NORMAL
+    material: MAGMA_BLOCK
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.16
+    size: 576
+    min-y: -240
+    max-y: -64
+    distribution: UNIFORM
+    discard-on-air-exposure: 0.50
+
+  - id: deep-lava
+    environment: NORMAL
+    material: LAVA
+    replace: OVERWORLD_BASE
+    attempts-per-chunk: 0.08
+    size: 576
+    min-y: -240
+    max-y: -64
+    distribution: UNIFORM
+    discard-on-air-exposure: 1.0
+
+  - id: ancient-debris-large
+    environment: NETHER
+    material: ANCIENT_DEBRIS
+    replace: NETHER_BASE
+    attempts-per-chunk: 0.3
+    size: 9
+    min-y: -256
+    max-y: -128
+    distribution: TRIANGLE
+
+  - id: ancient-debris-small
+    environment: NETHER
+    material: ANCIENT_DEBRIS
+    replace: NETHER_BASE
+    attempts-per-chunk: 0.3
+    size: 6
+    min-y: -256
+    max-y: -128
+    distribution: UNIFORM
+
+  - id: nether-quartz
+    environment: NETHER
+    material: NETHER_QUARTZ_ORE
+    replace: NETHERRACK
+    attempts-per-chunk: 4.8
+    size: 42
+    min-y: -246
+    max-y: 501
+    distribution: UNIFORM
+
+  - id: nether-quartz-deltas
+    environment: NETHER
+    material: NETHER_QUARTZ_ORE
+    replace: NETHERRACK
+    attempts-per-chunk: 9.6
+    size: 42
+    min-y: -246
+    max-y: 501
+    distribution: UNIFORM
+    biomes: [minecraft:basalt_deltas]
+
+  - id: nether-gold
+    environment: NETHER
+    material: NETHER_GOLD_ORE
+    replace: NETHERRACK
+    attempts-per-chunk: 3
+    size: 30
+    min-y: -246
+    max-y: 501
+    distribution: UNIFORM
+
+  - id: nether-gold-deltas
+    environment: NETHER
+    material: NETHER_GOLD_ORE
+    replace: NETHERRACK
+    attempts-per-chunk: 6
+    size: 30
+    min-y: -246
+    max-y: 501
+    distribution: UNIFORM
+    biomes: [minecraft:basalt_deltas]
