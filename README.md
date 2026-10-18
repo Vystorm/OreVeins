@@ -59,6 +59,10 @@ New chunks get OreVeins veins right away. Chunks that already existed are
 
 All commands need `oreveins.admin` (default: op).
 
+Rechte und Tab-Vorschläge (ab 2.8.1): `oreveins.admin` (OP) für alle Befehle, `oreveins.*` vergibt alles. Ohne Recht gibt
+es keine Vorschläge; mit Recht werden alle Unterbefehle, `stats <Welt>`, `retry confirm`, Simulationsvorgaben und
+`regenerate`-Ziele (auch `chunk <Welt>`) vorgeschlagen.
+
 | Command | What it does |
 | --- | --- |
 | `/oreveins status` | Passes, settings, retrofit counters and the progress of a running `regenerate all`. |

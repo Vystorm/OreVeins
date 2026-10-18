@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.8.1 — 2026-10-18
+
+- Rechte: deutsche Beschreibung für `oreveins.admin`, neuer Sammelknoten `oreveins.*`.
+- Tab-Vorschläge nur mit `oreveins.admin`; neu: `stats <Welt>`, `retry confirm`, Koordinaten-Beispiel bei `regenerate chunk`. Test `CommandTabTest`.
+
 ## 2.8.0 — 2026-10-13
 
 - **Maintenance controls:** UTC maintenance windows, per-minute chunk-start limits and a bounded work-time budget pause retrofit/regeneration safely between work units.

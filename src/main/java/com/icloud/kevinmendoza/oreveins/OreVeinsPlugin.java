@@ -597,9 +597,21 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
             @NotNull String alias, String @NotNull [] args) {
+        try {
+            return complete(sender, args, web != null,
+                    () -> Bukkit.getWorlds().stream().map(World::getName).toList());
+        } catch (RuntimeException failure) {
+            return List.of();
+        }
+    }
+
+    /** Suggestions on every level for senders with oreveins.admin, prefix-filtered case-insensitively. */
+    static List<String> complete(CommandSender sender, String[] args, boolean webAvailable,
+            java.util.function.Supplier<List<String>> worlds) {
+        if (args.length == 0 || !sender.hasPermission("oreveins.admin")) return List.of();
         List<String> options;
         if (args.length == 1) {
-            options = web != null ? SUBCOMMANDS_WITH_WEB : SUBCOMMANDS;
+            options = webAvailable ? SUBCOMMANDS_WITH_WEB : SUBCOMMANDS;
         } else if (args.length == 2 && args[0].equalsIgnoreCase("simulate")) {
             options = SIMULATION_PRESETS;
         } else if (args.length == 3 && args[0].equalsIgnoreCase("simulate")) {
@@ -610,12 +622,18 @@ public final class OreVeinsPlugin extends JavaPlugin implements Listener {
             options = List.of("overworld", "nether");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("compare")) {
             options = List.of("default", "iris-tall-world");
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("stats")) {
+            options = worlds.get();
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("retry")) {
+            options = List.of("confirm");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("regenerate")) {
             options = REGENERATE_TARGETS;
         } else if (args.length == 3 && args[0].equalsIgnoreCase("regenerate") && args[1].equalsIgnoreCase("preview")) {
             options = List.of("all", "cancel");
         } else if (args.length == 3 && args[0].equalsIgnoreCase("regenerate") && args[1].equalsIgnoreCase("chunk")) {
-            options = Bukkit.getWorlds().stream().map(World::getName).toList();
+            options = worlds.get();
+        } else if ((args.length == 4 || args.length == 5) && args[0].equalsIgnoreCase("regenerate") && args[1].equalsIgnoreCase("chunk")) {
+            options = List.of("0");
         } else {
             return List.of();
         }

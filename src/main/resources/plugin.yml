@@ -10,10 +10,15 @@ load: STARTUP
 softdepend: [vystorm_core]
 commands:
   oreveins:
-    description: Reloads, displays, or selectively regenerates OreVeins chunks.
-    usage: /oreveins <reload|status|web|regenerate <all|cancel|loaded|radius|chunk world x z>>
+    description: Lädt OreVeins neu, zeigt Status/Statistik und erzeugt Erzadern in Chunks gezielt neu.
+    usage: /oreveins <reload|status|stats [Welt]|simulate|history|failed|retry [confirm]|validate|compare|web|regenerate <all|cancel|loaded|preview|Radius|chunk Welt x z>>
     permission: oreveins.admin
 permissions:
+  oreveins.*:
+    description: Alle OreVeins-Rechte
+    default: op
+    children:
+      oreveins.admin: true
   oreveins.admin:
-    description: Allows OreVeins administration.
+    description: OreVeins-Verwaltung (alle /oreveins-Befehle, Admin-Bereich der Web-Seite, Fortschrittsmeldungen)
     default: op
