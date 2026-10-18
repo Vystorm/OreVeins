@@ -15,6 +15,18 @@ config-version: 1
 language: auto
 
 settings:
+  # Each rectangle protects ALL heights of every intersecting chunk from regeneration.
+  # Example: [{world: world, min-x: -32, max-x: 31, min-z: -32, max-z: 31}]
+  excluded-areas: []
+  # UTC daily window. Equal start/end means all day; disabled ignores the window.
+  maintenance:
+    enabled: false
+    start-utc: '00:00'
+    end-utc: '00:00'
+    # 0 = unlimited. Counts started chunks in a rolling minute, including failed attempts.
+    max-chunks-per-minute: 0
+    # Checked between work units, not a hard limit on the duration of one section.
+    max-work-millis-per-tick: 4
   # World names to handle. An empty list enables every NORMAL and NETHER world.
   enabled-worlds: []
   # Removes the ores the world generator placed before the configured veins are

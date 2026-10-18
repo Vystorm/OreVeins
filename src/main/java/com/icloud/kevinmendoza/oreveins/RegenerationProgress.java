@@ -83,15 +83,18 @@ final class RegenerationProgress {
     }
 
     void markDone(UUID world, int x, int z) throws IOException {
-        if (output == null || !done.computeIfAbsent(world, ignored -> ConcurrentHashMap.newKeySet()).add(key(x, z))) {
-            return;
+        if (output == null) throw new IOException("Progress log is closed");
+        Set<Long> recorded = done.computeIfAbsent(world, ignored -> ConcurrentHashMap.newKeySet());
+        if (recorded.contains(key(x, z))) return;
+        try {
+            output.writeLong(world.getMostSignificantBits());
+            output.writeLong(world.getLeastSignificantBits());
+            output.writeInt(x); output.writeInt(z); output.flush();
+        } catch (IOException failure) {
+            close(); // A partial record must not be followed by another; resume truncates the torn tail.
+            throw failure;
         }
-        output.writeLong(world.getMostSignificantBits());
-        output.writeLong(world.getLeastSignificantBits());
-        output.writeInt(x);
-        output.writeInt(z);
-        output.flush();
-        doneCount++;
+        recorded.add(key(x, z)); doneCount++;
     }
 
     int doneCount() {

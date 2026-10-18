@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.8.0 — 2026-10-13
+
+- **Maintenance controls:** UTC maintenance windows, per-minute chunk-start limits and a bounded work-time budget pause retrofit/regeneration safely between work units.
+- **Protection and recovery visibility:** explicit excluded-area rectangles are checked before loading and before each work unit; bounded failed-chunk records support deliberate retries, and regeneration history is kept separately from the authoritative checkpoint.
+- **Read-only previews:** administrators can estimate existing-region work from region location tables without loading chunks, and compare generation settings or inspect bounded simulation results.
+- **Generation analysis:** synthetic simulation reports six-face connected same-material component sizes per synthetic chunk, aggregated across seeds. Chunk boundaries cut components and neighboring veins may merge; results do not predict real-world veins. The bundled default preset is a tuned configuration, not Minecraft's exact vanilla distribution.
+- Storage and policy validation preserve malformed history/checkpoint data and reject invalid reloads rather than silently applying unsafe limits.
+
 ## 2.7.0 (2026-09-30)
 
 - Optional web page for Vystorm Core 0.24.0+ (soft dependency `vystorm_core`):

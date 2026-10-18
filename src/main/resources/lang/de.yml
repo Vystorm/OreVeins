@@ -4,7 +4,34 @@
 # Plugin; {prefix} fügt den Text von "prefix" ein.
 prefix: "[OreVeins] "
 
-usage: "{prefix}Verwendung: /{label} <reload|status|regenerate <all|cancel|loaded|<radius>|chunk <welt> <x> <z>>>"
+usage: "{prefix}Verwendung: /{label} <reload|status|stats [welt]|simulate [current|default|iris-tall-world] [Seeds 1-16] [Chunks 1-4] [overworld|nether]|validate|compare [default|iris-tall-world]|regenerate <preview|all|cancel|loaded|<Radius>|chunk <Welt> <x> <z>>>"
+
+analysis:
+  validation-valid: "{prefix}Die Kandidatenkonfiguration ist gültig: {passes} gültige Pässe, {warnings} Warnung(en). Aktive Einstellungen blieben unverändert."
+  validation-invalid: "{prefix}Die Kandidatenkonfiguration hat {errors} Fehler, {warnings} Warnung(en) und {passes} gültige Pässe. Aktive Einstellungen blieben unverändert."
+  problem: "{prefix}FEHLER {kind}: {subject}"
+  warning: "{prefix}WARNUNG {kind}: {subject}"
+  read-failed: "{prefix}Konfiguration konnte nicht geprüft werden: {error}"
+  comparison: "{prefix}Aktive Einstellungen mit Preset {preset} verglichen: {changed} geänderte Pässe, {references} geänderte Referenzhöhen. Es wurde nichts übernommen."
+  reference-change: "{prefix}Referenzhöhe: {change}"
+  pass-change: "{prefix}Pass {id}: Felder={fields}; effektives Y={effective-y}"
+  pass-state:
+    changed: "geändert"
+    preset-only: "im Preset hinzugefügt"
+    active-only: "im Preset entfernt"
+    unchanged: "unverändert"
+  preview: "{prefix}Nur-Lese-Schätzung der Regenerierung ({report}). Nur geladene Chunks; keine Chunks geladen oder geändert."
+  simulation-usage: "{prefix}Verwendung: /oreveins simulate [current|default|iris-tall-world] [Seeds 1-16] [Chunks 1-4] [overworld|nether]"
+  simulation-cooldown: "{prefix}Bitte warte 10 Sekunden vor der nächsten Simulation."
+  simulation-too-large: "{prefix}Diese Konfiguration überschreitet das Simulationslimit ({budget} modellierte Platzierungsversuche). Reduziere Seeds/Chunks oder vereinfache das Preset."
+  simulation-summary: "{prefix}NUR SIMULATION — {preset}, {environment}, {seeds} Seed(s) × {chunks} synthetische Chunks: {blocks} Blöcke. {label}"
+  simulation-row: "{prefix}Synthetisch {ore}: {blocks} geänderte Blöcke"
+  simulation-empty: "{prefix}In diesen synthetischen Beispielen wurden keine Blöcke platziert."
+
+stats:
+  summary: "{prefix}Erzeugte Erzplatzierungen seit Start: {blocks} in {worlds} erfassten Welten, {ores} Welt/Erz-Paaren; Filter={world}."
+  row: "{prefix}{world} · {ore}: {blocks}"
+  truncated: "{prefix}Zeige {shown} von {total} Welt/Erz-Zeilen. Filtere mit /oreveins stats <welt>."
 
 startup:
   failed: "OreVeins kann nicht starten: {error}"
@@ -77,10 +104,15 @@ web:
     title: "Erzadern"
     description: "Wo welches Erz in den Welten dieses Servers entsteht: Y-Höhen, Adergrößen und Häufigkeit."
     admin-title: "OreVeins-Verwaltung"
-    admin-description: "Status und Regenerierung von OreVeins."
+    admin-description: "Status, Erz-Statistik, synthetische Preset-Simulationen und Regenerierung von OreVeins."
   error:
     offline: "Dafür musst du auf dem Server online sein."
     no-permission: "Das darfst du nicht."
+    simulation-input: "Simulation braucht ein unterstütztes Preset, eine Umgebung, 1–16 Seeds und 1–4 Chunks."
+    simulation-cooldown: "Bitte warte 10 Sekunden vor der nächsten Simulation."
+    simulation-budget: "Dieses Preset überschreitet das Simulationslimit."
+    compare-preset: "Wähle das gebündelte Standardpreset oder das Iris-Hochland-Preset."
+    exclusion-read: "Die aktiven Ausschlusseinstellungen konnten nicht gelesen werden."
   ui:
     tab:
       guide: "Erzführer"
@@ -206,3 +238,118 @@ web:
       hours: "{h} h {m} min"
       minutes: "{m} min"
       days: "{d} T {h} h"
+    analysis:
+      title: "Analyse und Prüfung"
+      refresh: "Analyse aktualisieren"
+      validation: "Konfigurationsprüfung"
+      valid: "Konfiguration gültig"
+      invalid: "Konfiguration ungültig"
+      valid-passes: "Gültige Durchläufe: {count}"
+      errors: "Fehler"
+      warnings: "Hinweise"
+      compare: "Geladene Konfiguration mit Preset vergleichen"
+      compare-note: "Der Standardvergleich nutzt das mit OreVeins gebündelte Standardpreset; Iris nutzt das gebündelte Iris-Hochland-Preset."
+      compare-preset: "Vergleichspreset"
+      preset:
+        default: "Gebündelter Standard"
+        iris-tall-world: "Iris-Hochland"
+      fields: "Geänderte Felder"
+      y-range: "Effektiver Y-Bereich (aktiv → Referenz)"
+      state:
+        preset-only: "Nur im Referenz-Preset"
+        active-only: "Nur in der aktiven Konfiguration"
+        changed: "Geändert"
+      none: "Keine Abweichungen."
+    stats:
+      title: "Erfolgreiche Erzblock-Schreibvorgänge seit Serverstart"
+      total: "Erfolgreiche Erzblock-Schreibvorgänge"
+      worlds: "Erfasste Welten"
+      truncated: "Es werden nur die ersten 20 Einträge angezeigt."
+      empty: "Noch keine Schreibvorgänge erfasst."
+    simulation:
+      title: "Isolierte Simulation"
+      note: "Synthetische Biome- und Gesteinsproben; dies ist keine Vorhersage für echte Chunks und verändert keine Welt."
+      preset: "Preset"
+      current: "Aktiv"
+      default: "Standard"
+      iris-tall-world: "Iris-Hochland"
+      environment: "Umgebung"
+      overworld: "Oberwelt"
+      normal: "Normal"
+      nether: "Nether"
+      seeds: "Seeds (max. 16)"
+      chunks: "Chunks je Seed (max. 4)"
+      run: "Simulation starten"
+      offline: "Nur verfügbar, wenn der Server online ist."
+      summary: "{seeds} Seeds × {chunks} Chunks · {placed} synthetische Platzierungen"
+      distribution: "Verteilung je Chunk über Seeds"
+      material: "Material"
+      samples: "Seeds"
+      min: "Min."
+      max: "Max."
+      mean: "Mittel"
+      deviation: "Populations-Stdabw."
+    maintenance:
+      title: "Wartungsfenster und Schutz"
+      enabled: "Wartung aktiviert"
+      allowed: "Generierung jetzt erlaubt"
+      window: "Zeitfenster (UTC)"
+      limits: "Limits"
+      protected: "Übersprungene geschützte Chunks"
+      areas: "Ausgenommene Rechtecke"
+      no-areas: "Keine Ausschlussgebiete konfiguriert."
+    history:
+      title: "Regenerierungsverlauf"
+      empty: "Noch keine Regenerierungsaufträge gespeichert."
+      limits: "Die neuesten 15 Aufträge aus dem lokalen Verlauf; maximal 100 werden gespeichert. Dies ist kein Wiederholungs-Checkpoint."
+      unavailable: "Der Verlauf ist wegen eines Speicher- oder Lesefehlers nicht verfügbar."
+      actor: "Angefragt von"
+      scope: "Umfang"
+      started: "Gestartet"
+      ended: "Beendet"
+      queued: "Eingereiht"
+      completed: "Abgeschlossen"
+      failed: "Fehlgeschlagen"
+      skipped: "Übersprungen"
+      cancelled: "Abgebrochen"
+      truncated: "Weitere gespeicherte Einträge werden nicht angezeigt."
+      status:
+        ACTIVE: "Läuft"
+        COMPLETED: "Abgeschlossen"
+        FAILED: "Fehlgeschlagen"
+        CANCELLED: "Abgebrochen"
+        INTERRUPTED: "Unterbrochen"
+    common:
+      loading: "Lädt …"
+      error: "Die schreibgeschützte Abfrage ist fehlgeschlagen: {message}"
+failures:
+  summary: "Fehlgeschlagene Chunks: {count}; Verarbeitung wegen Speicherfehler pausiert: {blocked}. Höchstens 30 Einträge angezeigt."
+  row: "{world} Chunk {x},{z}: {reason}; fehlgeschlagene Versuche: {attempts}"
+  confirm: "Der Wiederholungsversuch ersetzt Erze/Lava erneut nur in den vermerkten Fehler-Chunks, auch in teilweise bearbeiteten Chunks. Das ist kein Rückgängigmachen. /oreveins retry confirm stellt höchstens 100 in die Warteschlange."
+  queued: "{count} Fehler-Chunks zur Wiederholung eingeplant. Erfolgreich verarbeitete Chunks wurden nicht hinzugefügt."
+
+maintenance:
+  status: "Wartungsfenster aktiv: {enabled}; UTC {start}–{end}; jetzt erlaubt: {allowed}; Budget: {budget} ms/Tick; neue Chunks/min: {rate} (0 = unbegrenzt)."
+
+region-preview:
+  busy: "Eine Regionsvorschau läuft bereits oder die 30-Sekunden-Pause ist noch aktiv."
+  started: "Lese vorhandene Regionsdateien. Keine Chunks werden geladen oder verändert. Abbruch: /oreveins regenerate preview cancel"
+  cancelled: "Regionsvorschau beendet. Ein Regenerierungsauftrag wird dadurch nicht abgebrochen."
+  world: "{world}: Bauhöhe {min}..{max}, bis zu {sections} Entfernungsabschnitte plus Erzeugung je Chunk."
+  result: "Vorschau: {chunks} belegte Chunk-Einträge in {files} Regionsdateien; {errors} Lesefehler. Das ist kein Welt-Snapshot: doppelte Regionspfade, gleichzeitige Speicherungen und ungültige Chunk-Inhalte können die reale Arbeit abweichen lassen."
+  error: "Lesefehler: {detail}"
+
+simulation-distribution:
+  row: "{ore}: je Chunk Min {min}, Max {max}, Mittel {mean}, Standardabweichung {stddev}; {samples} Seeds (fehlende Erze = 0)."
+  note: "Synthetische Schreibzählungen: keine Weltvorhersage, keine Konfidenzangabe und keine gemessene zusammenhängende Adergröße."
+
+exclusions:
+  status: "Ausgenommene Baugebiete: {areas}; übersprungene Chunks seit Start: {skipped}."
+
+history:
+  header: "Letzte 15 Regenerierungsaufträge (lokal, maximal 100 gespeichert). Verlauf verfügbar: {available}. Kein Wiederholungs-Checkpoint."
+  row: "{id} | {actor} | {scope} | {started}–{ended} | {status}: eingeplant {queued}, fertig {completed}, Fehler {failed}, übersprungen {skipped}, abgebrochen {cancelled}"
+
+simulation-connected:
+  row: "{ore}: {count} zusammenhängende Gruppen; min {min}, max {max}, Median {median} Blöcke."
+  note: "Sechsseitige Nachbarschaft je Erz und synthetischem Chunk. Chunkgrenzen schneiden Gruppen ab; angrenzende Adern können verschmelzen. Keine Weltvorhersage."

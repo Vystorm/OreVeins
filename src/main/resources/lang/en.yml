@@ -4,7 +4,34 @@
 # plugin; {prefix} inserts the "prefix" text below.
 prefix: "[OreVeins] "
 
-usage: "{prefix}Usage: /{label} <reload|status|regenerate <all|cancel|loaded|<radius>|chunk <world> <x> <z>>>"
+usage: "{prefix}Usage: /{label} <reload|status|stats [world]|simulate [current|default|iris-tall-world] [seeds 1-16] [chunks 1-4] [overworld|nether]|validate|compare [default|iris-tall-world]|regenerate <preview|all|cancel|loaded|<radius>|chunk <world> <x> <z>>>"
+
+analysis:
+  validation-valid: "{prefix}Candidate config is valid: {passes} valid passes, {warnings} warning(s). Active settings were not changed."
+  validation-invalid: "{prefix}Candidate config has {errors} error(s), {warnings} warning(s), {passes} valid pass(es). Active settings were not changed."
+  problem: "{prefix}ERROR {kind}: {subject}"
+  warning: "{prefix}WARNING {kind}: {subject}"
+  read-failed: "{prefix}Could not analyze config: {error}"
+  comparison: "{prefix}Compared active settings with preset {preset}: {changed} changed pass(es), {references} changed reference height(s). No settings were applied."
+  reference-change: "{prefix}Reference height: {change}"
+  pass-change: "{prefix}Pass {id}: fields={fields}; effective Y={effective-y}"
+  pass-state:
+    changed: "changed"
+    preset-only: "added by preset"
+    active-only: "removed by preset"
+    unchanged: "unchanged"
+  preview: "{prefix}Read-only regeneration estimate ({report}). Loaded chunks only; no chunks loaded or changed."
+  simulation-usage: "{prefix}Usage: /oreveins simulate [current|default|iris-tall-world] [seeds 1-16] [chunks 1-4] [overworld|nether]"
+  simulation-cooldown: "{prefix}Please wait 10 seconds before running another simulation."
+  simulation-too-large: "{prefix}This configuration exceeds the simulation work budget ({budget} modeled candidate placements). Reduce seeds/chunks or simplify the preset."
+  simulation-summary: "{prefix}SIMULATION ONLY — {preset}, {environment}, {seeds} seed(s) × {chunks} synthetic chunk(s): {blocks} blocks. {label}"
+  simulation-row: "{prefix}Synthetic {ore}: {blocks} changed block(s)"
+  simulation-empty: "{prefix}No blocks placed in the synthetic fixtures for this sample."
+
+stats:
+  summary: "{prefix}Generated ore writes since startup: {blocks} across {worlds} tracked world(s), {ores} world/ore pair(s); filter={world}."
+  row: "{prefix}{world} · {ore}: {blocks}"
+  truncated: "{prefix}Showing {shown} of {total} world/ore rows. Filter with /oreveins stats <world>."
 
 startup:
   failed: "OreVeins cannot start: {error}"
@@ -77,10 +104,15 @@ web:
     title: "Ore veins"
     description: "Where each ore spawns in this server's worlds: Y levels, vein sizes and how often."
     admin-title: "OreVeins admin"
-    admin-description: "Status and regeneration of OreVeins."
+    admin-description: "Status, generated-ore diagnostics, synthetic preset simulations and regeneration of OreVeins."
   error:
     offline: "You need to be online on the server for this."
     no-permission: "You are not allowed to do this."
+    simulation-input: "Simulation needs a supported preset, environment, 1–16 seeds and 1–4 chunks."
+    simulation-cooldown: "Wait 10 seconds before requesting another simulation."
+    simulation-budget: "That preset exceeds the simulation work budget."
+    compare-preset: "Choose either the bundled default preset or the Iris Tall World preset."
+    exclusion-read: "Could not read the active exclusion settings."
   ui:
     tab:
       guide: "Ore guide"
@@ -206,3 +238,118 @@ web:
       hours: "{h} h {m} min"
       minutes: "{m} min"
       days: "{d} d {h} h"
+    analysis:
+      title: "Analysis and validation"
+      refresh: "Refresh analysis"
+      validation: "Configuration validation"
+      valid: "Configuration is valid"
+      invalid: "Configuration is invalid"
+      valid-passes: "Valid passes: {count}"
+      errors: "Errors"
+      warnings: "Warnings"
+      compare: "Compare loaded configuration with a preset"
+      compare-note: "The default comparison uses OreVeins’ bundled default preset; Iris uses the bundled Iris Tall World preset."
+      compare-preset: "Reference preset"
+      preset:
+        default: "Bundled default"
+        iris-tall-world: "Iris Tall World"
+      fields: "Changed fields"
+      y-range: "Effective Y range (active → reference)"
+      state:
+        preset-only: "Reference preset only"
+        active-only: "Active configuration only"
+        changed: "Changed"
+      none: "No differences."
+    stats:
+      title: "Ore block writes since server start"
+      total: "Successful ore block writes"
+      worlds: "Tracked worlds"
+      truncated: "Only the first 20 entries are shown."
+      empty: "No writes recorded yet."
+    simulation:
+      title: "Isolated simulation"
+      note: "Synthetic biome and host-rock samples; this does not predict real chunks and does not change any world."
+      preset: "Preset"
+      current: "Active"
+      default: "Default"
+      iris-tall-world: "Iris Tall World"
+      environment: "Environment"
+      overworld: "Overworld"
+      normal: "Normal"
+      nether: "Nether"
+      seeds: "Seeds (max 16)"
+      chunks: "Chunks per seed (max 4)"
+      run: "Run simulation"
+      offline: "Available only while the server is online."
+      summary: "{seeds} seeds × {chunks} chunks · {placed} synthetic placements"
+      distribution: "Per-chunk distribution across seeds"
+      material: "Material"
+      samples: "Seeds"
+      min: "Min"
+      max: "Max"
+      mean: "Mean"
+      deviation: "Population std. dev."
+    maintenance:
+      title: "Maintenance window and protection"
+      enabled: "Maintenance enabled"
+      allowed: "Generation allowed now"
+      window: "Window (UTC)"
+      limits: "Limits"
+      protected: "Protected chunks skipped"
+      areas: "Excluded rectangles"
+      no-areas: "No exclusion areas configured."
+    history:
+      title: "Regeneration history"
+      empty: "No regeneration jobs saved yet."
+      limits: "The latest 15 jobs from local history; up to 100 are stored. This is not a retry checkpoint."
+      unavailable: "History is unavailable because of a read or storage error."
+      actor: "Requested by"
+      scope: "Scope"
+      started: "Started"
+      ended: "Ended"
+      queued: "Queued"
+      completed: "Completed"
+      failed: "Failed"
+      skipped: "Skipped"
+      cancelled: "Cancelled"
+      truncated: "Older stored entries are not shown."
+      status:
+        ACTIVE: "Active"
+        COMPLETED: "Completed"
+        FAILED: "Failed"
+        CANCELLED: "Cancelled"
+        INTERRUPTED: "Interrupted"
+    common:
+      loading: "Loading…"
+      error: "The read-only request failed: {message}"
+failures:
+  summary: "Failed chunks: {count}; processing paused by storage failure: {blocked}. Showing at most 30."
+  row: "{world} chunk {x},{z}: {reason}; failed attempts: {attempts}"
+  confirm: "Retry replaces ores/lava again only in the recorded failed chunks, including partly processed chunks. It is not an undo. Use /oreveins retry confirm to queue at most 100."
+  queued: "Queued {count} failed chunks for retry. Successfully processed chunks were not added."
+
+maintenance:
+  status: "Maintenance window enabled: {enabled}; UTC {start}–{end}; allowed now: {allowed}; budget: {budget} ms/tick; new chunks/min: {rate} (0 = unlimited)."
+
+region-preview:
+  busy: "A region preview is running or the 30-second cooldown is still active."
+  started: "Reading existing region files. No chunks are loaded or changed. Cancel: /oreveins regenerate preview cancel"
+  cancelled: "Region preview stopped. This does not cancel a regeneration campaign."
+  world: "{world}: build height {min}..{max}, up to {sections} removal sections plus generation per chunk."
+  result: "Preview: {chunks} occupied chunk entries in {files} region files; {errors} read errors. This is not a world snapshot: duplicate region locations, concurrent saves and invalid chunk payloads may change the actual work."
+  error: "Read error: {detail}"
+
+simulation-distribution:
+  row: "{ore}: per chunk min {min}, max {max}, mean {mean}, population standard deviation {stddev}; {samples} seeds (missing ores = 0)."
+  note: "Synthetic write counts: not a world forecast, confidence claim, or measured connected vein size."
+
+exclusions:
+  status: "Excluded building areas: {areas}; chunks skipped since startup: {skipped}."
+
+history:
+  header: "Last 15 regeneration runs (local, up to 100 stored). History available: {available}. This is not a retry checkpoint."
+  row: "{id} | {actor} | {scope} | {started}–{ended} | {status}: queued {queued}, completed {completed}, failed {failed}, skipped {skipped}, cancelled {cancelled}"
+
+simulation-connected:
+  row: "{ore}: {count} connected components; min {min}, max {max}, median {median} blocks."
+  note: "Six-face adjacency per material and synthetic chunk. Chunk boundaries truncate components; adjacent veins may merge. Not a world prediction."

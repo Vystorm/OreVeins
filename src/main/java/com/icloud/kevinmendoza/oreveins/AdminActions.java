@@ -61,6 +61,8 @@ final class AdminActions {
         this.reloader = reloader;
     }
 
+    Outcome attributed(String actor, Supplier<Outcome> action) { return retrofitter.attributed(actor, action); }
+
     Outcome reload() {
         return reloader.reload();
     }

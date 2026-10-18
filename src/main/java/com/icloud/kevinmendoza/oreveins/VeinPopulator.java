@@ -73,7 +73,7 @@ final class VeinPopulator extends BlockPopulator {
             return;
         }
 
-        GenerationRegion generationRegion = new LimitedGenerationRegion(region);
+        GenerationRegion generationRegion = new LimitedGenerationRegion(region, worldInfo.getName());
         if (settings.replaceExistingOres()) {
             removeExistingOres(generationRegion, environment, chunkX, chunkZ,
                     worldInfo.getMinHeight(), worldInfo.getMaxHeight());
@@ -127,7 +127,7 @@ final class VeinPopulator extends BlockPopulator {
         }
     }
 
-    private static void generateDefinitions(GeneratorSettings settings, World.Environment environment,
+    static void generateDefinitions(GeneratorSettings settings, World.Environment environment,
             HeightReference reference, GenerationRegion region, Random random,
             int chunkX, int chunkZ, int worldMinY, int worldMaxY, boolean regenerationOnly) {
         for (VeinDefinition vein : settings.veins()) {
@@ -402,7 +402,7 @@ final class VeinPopulator extends BlockPopulator {
         String getBiomeKey(int x, int y, int z);
     }
 
-    private record LimitedGenerationRegion(LimitedRegion delegate) implements GenerationRegion {
+    private record LimitedGenerationRegion(LimitedRegion delegate, String worldName) implements GenerationRegion {
         @Override
         public Material getType(int x, int y, int z) {
             return delegate.getType(x, y, z);
@@ -410,7 +410,11 @@ final class VeinPopulator extends BlockPopulator {
 
         @Override
         public void setType(int x, int y, int z, Material material) {
+            if (delegate.getType(x, y, z) == material) {
+                return;
+            }
             delegate.setType(x, y, z, material);
+            recordOreGeneration(worldName, material);
         }
 
         @Override
@@ -434,7 +438,12 @@ final class VeinPopulator extends BlockPopulator {
 
         @Override
         public void setType(int x, int y, int z, Material material) {
-            chunk.getBlock(x - (chunk.getX() << 4), y, z - (chunk.getZ() << 4)).setType(material, false);
+            Block block = chunk.getBlock(x - (chunk.getX() << 4), y, z - (chunk.getZ() << 4));
+            if (block.getType() == material) {
+                return;
+            }
+            block.setType(material, false);
+            recordOreGeneration(world.getName(), material);
         }
 
         @Override
@@ -451,5 +460,11 @@ final class VeinPopulator extends BlockPopulator {
     }
 
     private record BlockPos(int x, int y, int z) {
+    }
+
+    private static void recordOreGeneration(String worldName, Material material) {
+        if (OVERWORLD_ORES.contains(material) || NETHER_ORES.contains(material)) {
+            GenerationStatistics.record(worldName, material);
+        }
     }
 }

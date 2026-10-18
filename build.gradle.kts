@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.icloud.kevinmendoza"
-version = "2.7.0"
+version = "2.8.0"
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
@@ -55,6 +55,7 @@ tasks.named<ProcessResources>("processVystormResources") {
 }
 
 tasks.processResources {
+    inputs.property("version", project.version)
     filesMatching("plugin.yml") {
         expand("version" to project.version)
     }

@@ -62,6 +62,11 @@ All commands need `oreveins.admin` (default: op).
 | Command | What it does |
 | --- | --- |
 | `/oreveins status` | Passes, settings, retrofit counters and the progress of a running `regenerate all`. |
+| `/oreveins stats [world]` | Read-only counts of successful changed ore writes since startup, grouped by world and ore. Shows at most 20 rows. |
+| `/oreveins simulate [preset] [seeds] [chunks] [environment]` | Runs the real placement algorithm against synthetic host and biome fixtures. Defaults to the current config, one seed and one chunk. It never reads or changes real worlds or chunks. |
+| `/oreveins validate` | Reads and checks the on-disk YAML without changing the active settings. Reports invalid worlds, heights, materials, numeric values and overlapping passes. |
+| `/oreveins compare` | Compares active settings with the bundled `iris-tall-world` preset, including effective Y ranges for loaded worlds and whether passes were added or removed; never applies it. |
+| `/oreveins regenerate preview` | Read-only, bounded estimate over at most 4,096 already loaded chunks. It does not scan disk, load chunks or change blocks. |
 | `/oreveins reload` | Reloads `config.yml` and the language files. On an error the previous settings stay active. |
 | `/oreveins regenerate <radius>` | Player only: regenerates loaded chunks in a square radius (0..32 chunks) around you. |
 | `/oreveins regenerate loaded` | Regenerates every currently loaded chunk in all enabled worlds. Console OK. |
@@ -74,6 +79,18 @@ All commands need `oreveins.admin` (default: op).
 configured lava pass from the chunk and generates only those two categories
 again. Obsidian, magma and the rest of the terrain are left alone. Note that
 this also removes ore blocks **players placed** in those chunks.
+
+`stats` counts only ore blocks written by OreVeins after startup; it does not
+scan old chunks or persist counters. The tracker stores at most 128 distinct
+world names. `simulate` is an isolated what-if preview, clearly labeled as
+synthetic rather than an estimate of real terrain. It accepts at most 16 seeds
+and 4 chunks per seed, applies a conservative 120,000 modeled candidate
+placement budget, and has a 10-second per-player cooldown. Oversized requests
+are rejected before running the generator. Simulation results never enter the
+live generation statistics. The bundled default preset is tuned for vanilla-height worlds and vanilla Y/biome ranges,
+but it is not an exact reproduction of Minecraft's vanilla ore distribution. Connected-vein measurements count
+six-face same-material components inside each synthetic chunk; components are cut at chunk edges, and neighboring
+veins may merge.
 
 ## Configuration
 
@@ -159,7 +176,10 @@ mod, as an in-game overlay.
   progress of a running `regenerate all` (speed and time left, pushed to the
   page, no polling), and buttons for reload, `regenerate all`, `regenerate
   loaded`, `regenerate <radius>` around yourself (only while online) and
-  `regenerate cancel`. Every button asks for confirmation first; the server
+  `regenerate cancel`, with generation statistics and a bounded synthetic
+  preset simulator at `/generation/stats` and `/generation/simulate`. The
+  simulation accepts optional `preset`, `environment`, `seeds` and `chunks`
+  JSON fields. Every action asks for confirmation first; the server
   runs the same code as the command, checks the permission again and logs
   each action to the console.
 - `/oreveins web` opens the admin tab in the overlay or sends a login link.
@@ -205,3 +225,21 @@ the terms of the GNU General Public License as published by the Free Software
 Foundation; either version 2 of the License, or (at your option) any later
 version. It is distributed WITHOUT ANY WARRANTY. See [LICENSE](LICENSE) and
 [NOTICE](NOTICE).
+
+### Failed-chunk retries
+
+`/oreveins failed` lists up to 30 failures, attempt counts and whether processing is blocked by a storage failure. The bounded `failed-chunks.properties` index survives restart; unreadable files are preserved and processing pauses. `/oreveins retry confirm` queues at most 100 recorded failures without adding successful chunks. It may load existing chunks, never creates new ones, and repeats the existing ore/lava replacement algorithm on partially processed chunks: it is not rollback. Entries disappear only after successful completion. An unavailable world stays in the failure list. Fix storage errors before restarting; checkpoint failures pause the remaining queue rather than appending records after a torn write.
+
+### Regeneration maintenance window
+
+`settings.maintenance` controls a daily UTC start (inclusive) and end (exclusive), including overnight windows. Equal times permit the whole day. `enabled: false` disables the time restriction. `max-chunks-per-minute` (0 = unlimited, maximum 10000) caps chunk starts in a rolling minute, including failed attempts; an already started chunk can finish. Outside the window, queued and active jobs pause and the existing campaign checkpoint remains available. `max-work-millis-per-tick` (1–20, default 4) is checked between work units, so a single section can exceed it. The section count remains an additional limit. These controls affect retrofitting, not new world generation. `/oreveins status` reports the window and rate; invalid policies reject reload before application. The rolling rate window resets on server restart.
+
+`/oreveins regenerate preview all` scans existing region location tables off-thread in batches of at most 16 files, reports occupied entries, world height/section bounds and read errors, and never loads chunks or mutates blocks. It uses the same region-directory discovery as regeneration. This is an estimate rather than a consistent world snapshot or validation of chunk payloads; multiple directories containing the same chunk and ongoing saves can differ from the deduplicated actual queue. One preview can run globally with a 30-second cooldown; `/oreveins regenerate preview cancel` closes only the preview. The shorter `regenerate preview` remains a loaded-chunk-only estimate.
+
+### Protect building areas from regeneration
+
+`settings.excluded-areas` accepts up to 128 rectangles with `world` (name or UUID), `min-x`, `max-x`, `min-z`, and `max-z`. **Every intersecting chunk at all heights is skipped**, even for explicit chunk/retry commands. The check runs before chunk loading and again before each work unit, and `/oreveins status` reports skipped chunks. This explicit area list does not automatically import other claim plugins. It applies only to regeneration/retrofitting, not initial generation. Areas are validated before reload applies; never reverse min/max. A campaign records excluded chunks as handled, so removing an exclusion requires a new campaign to revisit them. If protection is enabled after work already began, earlier changes cannot be undone: processing stops and records `protected-after-partial-work` in the failure index.
+
+### Regeneration history
+
+`/oreveins history` lists the last 15 of at most 100 local manual runs, with actor UUID/console, scope, start/end UTC, queued/completed/failed/skipped/cancelled counts and outcome. The informational `regeneration-history.properties` is flushed every five seconds and on shutdown, separately from the authoritative campaign checkpoint. A crash can lose recent history counts; previously active entries become INTERRUPTED and do not initiate retries. A resumed all-world campaign creates a new system-attributed row referring to the existing checkpoint. Up to 32 simultaneous manual runs are recorded; when the audit capacity or storage is unavailable, generation still uses its separate safety checkpoint. Automatic chunk-load retrofits are represented by live counters, not individual history rows. Cancelling a campaign removes waiting jobs while the currently processed chunk is allowed to finish.
