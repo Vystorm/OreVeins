@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.2 — 2026-10-18
+
+- Konfiguration im Vystorm-Core-Editor: mit Vystorm Core 0.27.0+ ist `config.yml` unter `/vadmin config OreVeins` bearbeitbar (Recht `vystorm_core.config.oreveins`); 11 Werte (Sprache, Welten, Nachrüsten, Wartungsfenster) sind deutsch/englisch beschriftet, `config-version` ist ausgeblendet. Speichern wirkt wie `/oreveins reload`; ein ungültiger Wert wird abgelehnt und die bisherigen Einstellungen bleiben aktiv. Alte Dateien ohne `config-version` (2.5.0) werden bewusst nicht angemeldet, damit Core keine Vanilla-Standards hineinschreibt. Ohne Vystorm Core oder mit älterem Core ändert sich nichts.
+
 ## 2.8.1 — 2026-10-18
 
 - Rechte: deutsche Beschreibung für `oreveins.admin`, neuer Sammelknoten `oreveins.*`.

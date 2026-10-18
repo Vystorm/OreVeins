@@ -111,6 +111,10 @@ veins may merge.
 - `veins`: the passes (material, host rock, attempts per chunk, size, Y range,
   distribution, optional biomes, spawn chance and air-exposure discard).
 
+With Vystorm Core 0.27.0 or newer the file can also be edited in game under `/vadmin config OreVeins` (permission
+`vystorm_core.config.oreveins`; saving works like `/oreveins reload`). Legacy files without `config-version` are not
+offered there. Mit Vystorm Core 0.27.0+ ist die Datei auch im Spiel unter `/vadmin config OreVeins` bearbeitbar.
+
 ### Presets
 
 On every start OreVeins writes its presets to `plugins/OreVeins/presets/`

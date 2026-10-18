@@ -22,6 +22,8 @@ public final class VystormWebFactory implements WebIntegration.Factory {
 
     @Override
     public WebIntegration start(OreVeinsPlugin plugin, AdminActions actions) {
+        // Independent of the web page: config.yml in Core's admin config editor (Core 0.27.0+).
+        VystormConfigEditor.register(plugin, actions);
         boolean supported;
         try {
             supported = CoreApi.atLeast(MINIMUM_CORE)

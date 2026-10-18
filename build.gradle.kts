@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.icloud.kevinmendoza"
-version = "2.8.1"
+version = "2.8.2"
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
